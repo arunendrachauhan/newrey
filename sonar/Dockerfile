@@ -4,14 +4,16 @@
 
 FROM centos:7
 
-MAINTAINER Marcel Birkner <marcel.birkner@codecentric.de>
+MAINTAINER arun
 
-ENV JAVA_OPTS "$JAVA_OPTS -Duser.country=DE -Duser.language=de -Duser.timezone=Europe/Berlin"
+ENV JAVA_OPTS "$JAVA_OPTS -Duser.country=IN -Duser.language=en -Duser.timezone=Asia/Kolkata"
 
 # Set the JAVA_HOME variable to make it clear where Java is located
 ENV JAVA_HOME /usr/lib/jvm/java-1.8.0
 
-ENV SONAR_VERSION 5.6.3
+ENV SONAR_VERSION 6.5
+ENV SONAR_DIR sonarqube-$SONAR_VERSION
+ENV SONAR_ARTIFACT $SONAR_DIR.zip
 ENV SONARQUBE_HOME /opt/sonarqube
 
 # Plugin Versions
@@ -35,13 +37,13 @@ EXPOSE 9092
 RUN yum -y install unzip && yum clean all
 
 # Add SonarQube binaries from Nexus Repository
-ADD https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-${SONAR_VERSION}.zip $SONARQUBE_HOME/sonarqube-${SONAR_VERSION}.zip
+ADD https://binaries.sonarsource.com/Distribution/sonarqube/$SONAR_ARTIFACT $SONARQUBE_HOME/$SONAR_ARTIFACT
 
 # Unpack SonarQube Zip
 RUN set -x \
-	&& unzip $SONARQUBE_HOME/sonarqube-${SONAR_VERSION}.zip \
-	&& mv sonarqube-${SONAR_VERSION}/* $SONARQUBE_HOME \
-	&& rm $SONARQUBE_HOME/sonarqube-${SONAR_VERSION}.zip
+	&& unzip $SONARQUBE_HOME/$SONAR_ARTIFACT \
+	&& mv ${SONAR_DIR}/* $SONARQUBE_HOME \
+	&& rm $SONARQUBE_HOME/${SONAR_DIR}*
 
 # Add plugins
 RUN mkdir -p $SONARQUBE_HOME/extensions/plugins/

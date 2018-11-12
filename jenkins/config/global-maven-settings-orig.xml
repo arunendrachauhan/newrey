@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
       <settings xmlns="http://maven.apache.org/SETTINGS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
       <mirrors>
       <mirror>
@@ -71,7 +71,7 @@
       <id>org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig1435422191538</id>
       <name>MyGlobalSettings</name>
       <comment>MyGlobalSettings</comment>
-      <content><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+      <content><?xml version="1.1" encoding="UTF-8" standalone="no"?>
       <settings xmlns="http://maven.apache.org/SETTINGS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
       <mirrors>
       <mirror>

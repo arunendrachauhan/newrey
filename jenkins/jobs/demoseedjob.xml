@@ -1,0 +1,75 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.25">
+  <actions/>
+  <description></description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>10</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.29.3">
+      <projectUrl>https://github.com/arunendrachauhan/newrey.git</projectUrl>
+      <displayName>DEMO</displayName>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>env</name>
+          <description></description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>demo</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers>
+        <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.29.3">
+          <spec></spec>
+        </com.cloudbees.jenkins.GitHubPushTrigger>
+        <hudson.triggers.SCMTrigger>
+          <spec></spec>
+          <ignorePostCommitHooks>false</ignorePostCommitHooks>
+        </hudson.triggers.SCMTrigger>
+      </triggers>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@2.60">
+    <scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.1">
+      <configVersion>2</configVersion>
+      <userRemoteConfigs>
+        <hudson.plugins.git.UserRemoteConfig>
+          <url>https://github.com/arunendrachauhan/newrey.git</url>
+        </hudson.plugins.git.UserRemoteConfig>
+      </userRemoteConfigs>
+      <branches>
+	  <hudson.plugins.git.BranchSpec>
+          <name>*/master</name>
+        </hudson.plugins.git.BranchSpec>
+      </branches>
+      <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+      <submoduleCfg class="list"/>
+      <extensions/>
+    </scm>
+    <scriptPath>jenkins/Jenkinsfile</scriptPath>
+    <lightweight>true</lightweight>
+  </definition>
+  <triggers/>
+  <builders>
+    <javaposse.jobdsl.plugin.ExecuteDslScripts plugin="job-dsl@1.38">
+      <targets>jenkins/seedjobs/*.groovy</targets>
+      <usingScriptText>false</usingScriptText>
+      <ignoreExisting>false</ignoreExisting>
+      <removedJobAction>DELETE</removedJobAction>
+      <removedViewAction>DELETE</removedViewAction>
+      <lookupStrategy>JENKINS_ROOT</lookupStrategy>
+      <additionalClasspath></additionalClasspath>
+    </javaposse.jobdsl.plugin.ExecuteDslScripts>
+  </builders>
+  <disabled>false</disabled>
+</flow-definition>
