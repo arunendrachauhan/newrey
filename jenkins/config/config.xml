@@ -68,33 +68,13 @@
       <filterQueue>false</filterQueue>
       <properties class="hudson.model.View$PropertyList"/>
     </hudson.model.AllView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
-      <name>Seed Jobs</name>
-      <description></description>
-      <filterExecutors>true</filterExecutors>
-      <filterQueue>true</filterQueue>
-      <properties class="hudson.model.View$PropertyList"/>
-      <jobNames>
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.views.LastDurationColumn/>
-        <hudson.views.BuildButtonColumn/>
-      </columns>
-      <includeRegex>.*demo.*</includeRegex>
-      <recurse>false</recurse>
-    </listView>
   </views>
-  <primaryView>All</primaryView>
-  <slaveAgentPort>50000</slaveAgentPort>
+  <primaryView>all</primaryView>
+  <slaveAgentPort>-1</slaveAgentPort>
   <label></label>
+  <crumbIssuer class="hudson.security.csrf.DefaultCrumbIssuer">
+    <excludeClientIPFromCrumb>false</excludeClientIPFromCrumb>
+  </crumbIssuer>
   <nodeProperties/>
   <globalNodeProperties/>
 </hudson>
