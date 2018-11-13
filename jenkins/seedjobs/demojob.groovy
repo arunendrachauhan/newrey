@@ -2,7 +2,7 @@ def gitUrl = 'https://github.com/codecentric/conference-app'
 
 createPipelineJob ("MyDemo", gitUrl, "jenkins/Jenkinsfile")
 def createPipelineJob (def jobName, def gitUrl, def scriptPath){
-pipelineJob("${jobName}") {
+pipelineJob( jobName ) {
 	description()
 	keepDependencies(false)
 	definition {
@@ -16,7 +16,7 @@ pipelineJob("${jobName}") {
 					branch("*/master")
 				}
 			}
-			scriptPath("${scriptPath}")
+			scriptPath( scriptPath )
 		}
 	}
 	disabled(false)
