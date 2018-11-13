@@ -27,3 +27,4 @@ pipelineJob("${jobName}") {
 		}
 	}
 }
+}
