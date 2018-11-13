@@ -10,7 +10,7 @@ pipelineJob("${jobName}") {
 			scm {
 				git {
 					remote {
-						github(${gitUrl}, "https")
+						github(gitUrl, "https")
 
 					}
 					branch("*/master")
