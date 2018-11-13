@@ -16,7 +16,7 @@ pipelineJob("${jobName}") {
 					branch("*/master")
 				}
 			}
-			scriptPath(${scriptPath})
+			scriptPath("${scriptPath}")
 		}
 	}
 	disabled(false)
