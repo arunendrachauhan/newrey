@@ -1,7 +1,7 @@
-def gitUrl = 'https://github.com/codecentric/conference-app'
+def gitUrl = 'arunendrachauhan/newrey'
 
 createPipelineJob ("MyDemo", gitUrl, "jenkins/Jenkinsfile")
-def createPipelineJob (def jobName, def gitUrl, def scriptPath){
+def createPipelineJob (def jobName, def gitHubUrl, def scriptFilePath){
 pipelineJob( jobName ) {
 	description()
 	keepDependencies(false)
@@ -10,13 +10,13 @@ pipelineJob( jobName ) {
 			scm {
 				git {
 					remote {
-						github(gitUrl, "https")
+						github(gitHubUrl, "https")
 
 					}
 					branch("*/master")
 				}
 			}
-			scriptPath( scriptPath )
+			scriptPath(scriptFilePath)
 		}
 	}
 	disabled(false)
