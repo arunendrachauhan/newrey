@@ -1,61 +1,51 @@
-#
-# Creates a docker container with SonarQube, incl. several plugins
-#
+FROM openjdk:8-alpine
 
-FROM centos:7
-
-MAINTAINER arun
-
-ENV JAVA_OPTS "$JAVA_OPTS -Duser.country=IN -Duser.language=en -Duser.timezone=Asia/Kolkata"
-
-# Set the JAVA_HOME variable to make it clear where Java is located
-ENV JAVA_HOME /usr/lib/jvm/java-1.8.0
-
-ENV SONAR_VERSION 6.5
-ENV SONAR_DIR sonarqube-$SONAR_VERSION
-ENV SONAR_ARTIFACT $SONAR_DIR.zip
-ENV SONARQUBE_HOME /opt/sonarqube
-
-# Plugin Versions
-ENV SONAR_JAVA_PLUGIN 4.2
-ENV SONAR_WEB_PLUGIN 2.4
-ENV SONAR_SCM_GIT_PLUGIN 1.0
-
-RUN INSTALL_PKGS="java-1.8.0-openjdk.x86_64" && \
-    yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \
-    yum clean all  && \
-    localedef -f UTF-8 -i en_US en_US.UTF-8
+ENV SONAR_VERSION=6.7.5 \
+    SONARQUBE_HOME=/opt/sonarqube \
+    # Database configuration
+    # Defaults to using H2
+    SONARQUBE_JDBC_USERNAME=sonar \
+    SONARQUBE_JDBC_PASSWORD=sonar \
+    SONARQUBE_JDBC_URL=
 
 # Http port
 EXPOSE 9000
 
-# H2 Database port
-EXPOSE 9092
+RUN addgroup -S sonarqube && adduser -S -G sonarqube sonarqube
 
-# Install packages necessary
-RUN yum -y install unzip && yum clean all
-
-# Add SonarQube binaries from Nexus Repository
-ADD https://binaries.sonarsource.com/Distribution/sonarqube/$SONAR_ARTIFACT $SONARQUBE_HOME/$SONAR_ARTIFACT
-
-# Unpack SonarQube Zip
 RUN set -x \
-	&& unzip $SONARQUBE_HOME/$SONAR_ARTIFACT \
-	&& mv ${SONAR_DIR}/* $SONARQUBE_HOME \
-	&& rm $SONARQUBE_HOME/${SONAR_DIR}*
+    && apk add --no-cache gnupg unzip \
+    && apk add --no-cache libressl wget \
+    && apk add --no-cache su-exec \
+    && apk add --no-cache bash \
+
+    # pub   2048R/D26468DE 2015-05-25
+    #       Key fingerprint = F118 2E81 C792 9289 21DB  CAB4 CFCA 4A29 D264 68DE
+    # uid                  sonarsource_deployer (Sonarsource Deployer) <infra@sonarsource.com>
+    # sub   2048R/06855C1D 2015-05-25
+    && (gpg --keyserver ha.pool.sks-keyservers.net --recv-keys F1182E81C792928921DBCAB4CFCA4A29D26468DE \
+	    || gpg --keyserver ipv4.pool.sks-keyservers.net --recv-keys F1182E81C792928921DBCAB4CFCA4A29D26468DE) \
+
+    && mkdir /opt \
+    && cd /opt \
+    && wget -O sonarqube.zip --no-verbose https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-$SONAR_VERSION.zip \
+    && wget -O sonarqube.zip.asc --no-verbose https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-$SONAR_VERSION.zip.asc \
+    && gpg --batch --verify sonarqube.zip.asc sonarqube.zip \
+    && unzip sonarqube.zip \
+    && mv sonarqube-$SONAR_VERSION sonarqube \
+    && chown -R sonarqube:sonarqube sonarqube \
+    && rm sonarqube.zip* \
+    && rm -rf $SONARQUBE_HOME/bin/*
 
 # Add plugins
 RUN mkdir -p $SONARQUBE_HOME/extensions/plugins/
 ADD http://central.maven.org/maven2/org/sonarsource/java/sonar-java-plugin/${SONAR_JAVA_PLUGIN}/sonar-java-plugin-${SONAR_JAVA_PLUGIN}.jar $SONARQUBE_HOME/extensions/plugins/sonar-java-plugin-${SONAR_JAVA_PLUGIN}.jar
 ADD http://central.maven.org/maven2/org/sonarsource/sonar-web-plugin/sonar-web-plugin/${SONAR_WEB_PLUGIN}/sonar-web-plugin-${SONAR_WEB_PLUGIN}.jar $SONARQUBE_HOME/extensions/plugins/sonar-web-plugin-${SONAR_WEB_PLUGIN}.jar
 ADD http://central.maven.org/maven2/org/codehaus/sonar-plugins/sonar-scm-git-plugin/${SONAR_SCM_GIT_PLUGIN}/sonar-scm-git-plugin-${SONAR_SCM_GIT_PLUGIN}.jar $SONARQUBE_HOME/extensions/plugins/sonar-scm-git-plugin-${SONAR_SCM_GIT_PLUGIN}.jar
-COPY run.sh $SONARQUBE_HOME
+
+VOLUME "$SONARQUBE_HOME/data"
 
 WORKDIR $SONARQUBE_HOME
-
-VOLUME ["$SONARQUBE_HOME/data","$SONARQUBE_HOME/conf","$SONARQUBE_HOME/logs"]
-
-RUN chmod -R 777 $SONARQUBE_HOME
-
-CMD ["/opt/sonarqube/run.sh"]
+COPY run.sh $SONARQUBE_HOME/bin/
+RUN sudo chmod +x $SONARQUBE_HOME/bin/run.sh
+ENTRYPOINT ["./bin/run.sh"]
