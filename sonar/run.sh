@@ -12,8 +12,18 @@ exec java -jar lib/sonar-application-$SONAR_VERSION.jar \
   -Dsonar.jdbc.username="$SONARQUBE_JDBC_USERNAME" \
   -Dsonar.jdbc.password="$SONARQUBE_JDBC_PASSWORD" \
   -Dsonar.jdbc.url="$SONARQUBE_JDBC_URL" \
-	-Dsonar.web.host="0.0.0.0" \
-	-Dsonar.web.port="9000" \
-	-Dsonar.web.context="/sonar" \
-  -Dsonar.web.javaAdditionalOpts="-server" \
+#	-Dsonar.web.context="/sonar" \
+  -Dsonar.web.javaAdditionalOpts="$SONARQUBE_WEB_JVM_OPTS -Djava.security.egd=file:/dev/./urandom" \
 	"$@"
+echo 'creating the Domain Admins group...'
+curl -s -u admin:admin -X POST localhost:9000/api/user_groups/create -d 'name=Admins'
+admins_permissions=(
+    'admin'
+    'profileadmin'
+    'gateadmin'
+    'provisioning'
+)
+for permission in "${admins_permissions[@]}"; do
+    echo "adding the $permission permission to the Admins group..."
+    curl -s -u admin:admin -X POST localhost:9000/api/permissions/add_group -d 'groupName=Admins' -d "permission=$permission"
+done
